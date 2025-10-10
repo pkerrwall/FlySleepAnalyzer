@@ -1,13 +1,13 @@
 import streamlit as st
 import json
 import os
-from datetime import date, time
+from datetime import date, time, datetime
 
 DEFAULTS_FILE = "user_defaults.json"
 
 def save_user_defaults(defaults):
     with open(DEFAULTS_FILE, "w") as f:
-        json.dump(defaults, f, indent=2)
+        json.dump(defaults, f, indent=2, default=str)
 
 def load_user_defaults():
     if os.path.exists(DEFAULTS_FILE):
@@ -27,15 +27,27 @@ end_offset_days = st.number_input("Default End Date Offset (days)",
                                   value=existing_defaults.get("end_offset_days", 0), step=1)
 
 st.subheader("Fallback Dates (used if no file is uploaded)")
-start_date = st.date_input("Fallback LD Start Date", 
-                           value=existing_defaults.get("start_date", "2024-01-01"))
-end_date = st.date_input("Fallback LD End Date", 
-                         value=existing_defaults.get("end_date", "2024-01-31"))
+
+# Convert string dates back to date objects
+default_start = existing_defaults.get("start_date", "2024-01-01")
+if isinstance(default_start, str):
+    default_start = datetime.strptime(default_start, "%Y-%m-%d").date()
+
+default_end = existing_defaults.get("end_date", "2024-01-31")
+if isinstance(default_end, str):
+    default_end = datetime.strptime(default_end, "%Y-%m-%d").date()
+
+start_date = st.date_input("Fallback LD Start Date", value=default_start)
+end_date = st.date_input("Fallback LD End Date", value=default_end)
 
 st.subheader("DAM System Defaults")
 frequency = st.number_input("DAM Frequency (min)", value=existing_defaults.get("frequency", 1), min_value=1)
 threshold = st.number_input("Count Threshold", value=existing_defaults.get("threshold", 100), min_value=1)
-light_onset = st.time_input("Light Onset Time", value=existing_defaults.get("light_onset", time(6, 0)))
+default_light = existing_defaults.get("light_onset", "06:00")
+if isinstance(default_light, str):
+    default_light = datetime.strptime(default_light, "%H:%M").time()
+
+light_onset = st.time_input("Light Onset Time", value=default_light)
 
 if st.button("Save Defaults"):
     defaults = {
