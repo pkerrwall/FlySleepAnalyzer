@@ -79,6 +79,7 @@ def save_analysis():
         'ind_sleep_bout_df': st.session_state.get('ind_sleep_bout_df'),
         'sleep_grouped': st.session_state.get('grouped'),
         'sleep_grouped2': st.session_state.get('grouped2'),
+        'available_channels': st.session_state.get('available_channels', []),
 
         # Plots as figure objects
         'fig_summary_locomotor': st.session_state.get('fig_summary'),
@@ -414,19 +415,15 @@ with tabA:
                                     max_value=max_date,
                                     key='ld_end_date')
             dd_start_date = st.date_input("DD Start Date", 
-                                value=st.session_state.monitor_settings.get('dd_start_date', ld_end_date + timedelta(days=1)),
-                                min_value=ld_end_date + timedelta(days=1), 
-                                max_value=max_date,
-                                key='dd_start_date')
+                                        value=st.session_state.monitor_settings.get('dd_start_date', ld_end_date + timedelta(days=1)),
+                                        min_value=ld_end_date + timedelta(days=1), 
+                                        max_value=max_date,
+                                        key='dd_start_date')
             dd_end_date = st.date_input("DD End Date", 
-                                value=st.session_state.monitor_settings.get('dd_end_date', max_date), 
-                                min_value=dd_start_date, 
-                                max_value=max_date,
-                                key='dd_end_date')
-
-            # Combine LD and DD ranges for filtering and saving
-            start_date = ld_start_date.strftime('%d %b %y') + ' 00:00:00'
-            end_date = dd_end_date.strftime('%d %b %y') + ' 23:59:59'
+                                    value=st.session_state.monitor_settings.get('dd_end_date', max_date), 
+                                    min_value=dd_start_date, 
+                                    max_value=max_date,
+                                    key='dd_end_date')
 
         # Save LD/DD settings to session state
         st.session_state.monitor_settings['ld_dd_settings'] = {
